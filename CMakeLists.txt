@@ -21,7 +21,7 @@ bunsan_add_shared_library(${PROJECT_NAME}
     src/stub.cpp
 )
 
-bunsan_install_headers()
+#bunsan_install_headers()
 bunsan_install_targets(${PROJECT_NAME})
 
 bunsan_include_tests()
