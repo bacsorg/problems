@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 2.8)
 include(BunsanCommon)
 
 bunsan_use_bunsan(common pm)
-bunsan_use_boost(system filesystem serialization unit_test_framework)
+bunsan_use_boost(system filesystem serialization)
 bunsan_use_protobuf()
 
 # Common plugins
