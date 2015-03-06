@@ -12,7 +12,7 @@ set(problem_types
     single
 )
 
-bunsan_add_shared_library(${PROJECT_NAME}
+bunsan_add_library(${PROJECT_NAME}
     src/stub.cpp
 )
 foreach(problem_type ${problem_types})
