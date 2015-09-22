@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 include(${CMAKE_SOURCE_DIR}/system-config.cmake OPTIONAL)
 
-project(bunsan_bacs_problems)
+project(bacs_problems)
 
 if(BunsanCMakeBuiltin)
     BunsanCMakeLoad()
@@ -20,7 +20,7 @@ bunsan_add_library(${PROJECT_NAME}
     src/stub.cpp
 )
 foreach(problem_type ${problem_types})
-    set(package bunsan_bacs_problem_${problem_type})
+    set(package bacs_problem_${problem_type})
     bunsan_use_bunsan_package(${PROJECT_NAME} ${package} ${package})
 endforeach()
 
