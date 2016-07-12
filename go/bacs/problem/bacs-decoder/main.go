@@ -28,63 +28,53 @@ type Result struct {
 	Back     string
 }
 
+func handleTemplate(w http.ResponseWriter, req *http.Request, name string) {
+	err := templates.ExecuteTemplate(w, name, nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func decodeHandler(w http.ResponseWriter, req *http.Request, name string,
+	decode func(base64data string) (string, error)) {
+	var err error
+	if req.Method == "POST" {
+		var text string
+		text, err = decode(req.FormValue("base64data"))
+		if err == nil {
+			err = templates.ExecuteTemplate(w, "result.html", Result{
+				Name:     name,
+				Protobuf: text,
+				Back:     req.URL.Path,
+			})
+		}
+	} else {
+		err = templates.ExecuteTemplate(w, "single_result.html", nil)
+	}
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func main() {
 	flag.Parse()
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		err := templates.ExecuteTemplate(w, "index.html", nil)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		handleTemplate(w, req, "index.html")
 	})
 	mux.HandleFunc("/single", func(w http.ResponseWriter, req *http.Request) {
-		err := templates.ExecuteTemplate(w, "single_index.html", nil)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		handleTemplate(w, req, "single_index.html")
 	})
 	mux.HandleFunc("/single/task",
 		func(w http.ResponseWriter, req *http.Request) {
-			var err error
-			if req.Method == "POST" {
-				var text string
-				text, err = decoder.SingleTaskDecoder.DecodeBase64ToText(
-					req.FormValue("base64data"))
-				if err == nil {
-					err = templates.ExecuteTemplate(w, "result.html", Result{
-						Name:     "Task",
-						Protobuf: text,
-						Back:     "/single/task",
-					})
-				}
-			} else {
-				err = templates.ExecuteTemplate(w, "single_task.html", nil)
-			}
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
+			decodeHandler(w, req, "Task",
+				decoder.SingleTaskDecoder.DecodeBase64ToText)
 		})
 	mux.HandleFunc("/single/result",
 		func(w http.ResponseWriter, req *http.Request) {
-			var err error
-			if req.Method == "POST" {
-				var text string
-				text, err = decoder.SingleResultDecoder.DecodeBase64ToText(
-					req.FormValue("base64data"))
-				if err == nil {
-					err = templates.ExecuteTemplate(w, "result.html", Result{
-						Name:     "Result",
-						Protobuf: text,
-						Back:     "/single/result",
-					})
-				}
-			} else {
-				err = templates.ExecuteTemplate(w, "single_result.html", nil)
-			}
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
+			decodeHandler(w, req, "Result",
+				decoder.SingleResultDecoder.DecodeBase64ToText)
 		})
 
 	n := negroni.Classic()
