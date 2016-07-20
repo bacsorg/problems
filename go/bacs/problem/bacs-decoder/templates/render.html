@@ -1,0 +1,26 @@
+{{template "header.html"}}
+
+<form action="" method="post">
+    {{if .Types}}
+        <select name="Form.Type">
+            {{$type := .Form.Type}}
+            {{range $value, $text := .Types}}
+                <option value="{{print $value}}" {{if eq $value $type}}selected="selected"{{end}}>
+                    {{print $text}}
+                </option>
+            {{end}}
+        </select><br />
+    {{end}}
+    <textarea name="Form.Base64Data">{{.Form.Base64Data}}</textarea><br />
+    <input type="submit" value="Decode" />
+    <br />
+    {{if .Error}}
+        Error while rendering input: <pre>{{.Error}}</pre>
+    {{end}}
+    {{if .RenderedData}}
+        {{.Title}}:
+        <pre>{{.RenderedData}}</pre>
+    {{end}}
+</form>
+
+{{template "footer.html"}}
